@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Nutrient Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Food Nutrient Detector</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="food_image" required>
+            <input type="text" name="food_name" placeholder="Type food name (optional)">
+            <button type="submit">Detect Food</button>
+        </form>
+
+        {% if candidates %}
+            <h2>Top Candidates:</h2>
+            <ul>
+            {% for c in candidates %}
+                <li>{{ c }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if nutrition %}
+            <h2>Nutrition Info:</h2>
+            <ul>
+                <li>Food: {{ nutrition.food }}</li>
+                <li>Calories: {{ nutrition.calories }}</li>
+                <li>Carbs: {{ nutrition.carbs }}</li>
+                <li>Fat: {{ nutrition.fat }}</li>
+                <li>Protein: {{ nutrition.protein }}</li>
+                <li>Fiber: {{ nutrition.fiber }}</li>
+            </ul>
+        {% endif %}
+
+        {% if img_url %}
+            <h2>Result Image:</h2>
+            <img src="{{ url_for('static', filename='uploads/result.jpg') }}" alt="Result">
+        {% endif %}
+    </div>
+</body>
+</html>
+
