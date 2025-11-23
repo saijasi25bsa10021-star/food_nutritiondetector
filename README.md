@@ -1,387 +1,135 @@
-# food_nutritiondetector
-Food Nutrient DetectovFood Nutrient Detector
+# Food nutrition detector
 
-A lightweight Python project that can run completely offline: detects food from an image and retrieves nutrition information from CSV files. Includes both a command-line interface, a simple Flask web user interface, and tools for loading and querying nutrition datasets.
+ it is python project that can run offline .This detects food from an image and retrieves nutrition information from dataset csv file
 
-Features
-- Image-based food detection using MobileNetV2 ([detect.detect_food](detect.py)).
-Nutrition lookup from CSV datasets ([lookup.get_nutrition](lookup.py), [food_utils.FoodUtil](food_utils.py)).
-- A simple Flask web UI to upload images and show results: [app.py](app.py), [detect_and_lookup.py](detect_and_lookup.py), [index.html](index.html), [script.js](script.js), [style.css](style.css).
-Methods to load and inspect the datasets: [data_loader.load_dataset](data_loader.py), [read.py](read.py), [food_nutrition.py](food_nutrition.py).
+ # Features
 
-CSV datasets included: daily_food_nutrition_dataset.csv and nutrition_dataset.csv, see folder nutrition_dataset.csv/ and folder_datasets/.
-## Repository structure
-- [app.py](app.py) — Minimal Flask API endpoints using [lookup.get_nutrition](lookup.py) and [detect.detect_food](detect.py).
-- [detect.py](detect.py) — Camera capture and MobileNetV2 inference (detect_food).
-- [lookup.py](lookup.py) — CSV-based nutrition lookup (get_nutrition).
-- [detect_and_lookup.py](detect_and_lookup.py) — Flask web application which overlays nutrition on images and serves the UI via the index route.
-- [data_loader.py](data_loader.py) —CSV loader helper (load_dataset).
-- [food_utils.py](food_utils.py) — FoodUtil helper class for dataset queries.
-- [main.py](main.py) — CLI demo which captures image, detects food, and prints nutrition.
-- [read.py](read.py), [food_nutrition.py](food_nutrition.py) - quick dataset inspection scripts.
-- [index.html](index.html), [script.js](script.js), [style.css](style.css) — web UI files.
-- Datasets :
+ 1 it can detect food through image using MobileNetV2
+ (detect.detect_food)
+ 2 it further lookup nutrition fromm csv datasets using lookup.py and food_utils.py
 
-- daily_food_nutrition_dataset.csv
+3 we use web UI for image upload and for displaying result using app.py,detect_and_lookup.py,index.html,script.jds,style.css
 
-nutrition_dataset.csv and the folder_datasets/ subfolder.
-Quick start
-1. Create Python virtual environment and install dependencies:
-sh
+4 we are loading dataset and inspection through data_loader.py,read.py,food_nutrition.py.
 
-python -m venv .venv
+5 In this project  we use two CSV datasets such as daily_food_nutrition_dataset.csv and nutrition_dataset.csv
 
-source .venv/bin/activate  # or .venv\Scripts\activate on Windows
-pip install -r requirements.txt
+# Repository Structure
 
-(If there is no requirements.txt, install: flask opencv-python tensorflow pandas.)
+1 app.py - we use this for minimal flask API endpoints using detection & lookup
 
-2. Start the web app, simple UI:
-sh
+2 detect.py - we use this for webcam capture and MobileNetV2 inference
 
-python detect_and_lookup.py
+3 lookup.py - we use it for CSV based nutrition lookups
 
-Open http://127.0.0.1:5000/
-3. Run the minimal API (alternative):
+4 detect_and_lookup.py - we use this  to flask web app from overlaying nutrition info on images
 
-sh
+5 data_loader.py– we use this  to load CSV datasets.
 
-python app.py
-- API endpoint: POST /get_nutrition uses [lookup.get_nutrition](lookup.py).
-- JavaScript detection trigger calls /detect in the UI flow (script.js).
-4. CLI demo:
-sh
-python main.py
-This uses [detect.detect_food](detect.py) to capture an image from the webcam before looking up nutrition with [lookup.get_nutrition](lookup.py).
-## Important code entry points (quick links)
+6 food_utils.py – it helpes class for dataset queries.
 
-- Detection: [detect.detect_food](detect.py) — captures from the webcam and returns the top label.
-- Lookup: [lookup.get_nutrition](lookup.py) — reads daily_food_nutrition_dataset.csv.
-- Dataset loader: [data_loader.load_dataset](data_loader.py)
-- Web UI route: [detect_and_lookup.index](detect_and_lookup.py)
+7 main.py – it captures image, detects food, and prints nutritions
 
-- UI template: [index.html](index.html)
-- Client-side script: [script.js](script.js).
+8 read.py / food_nutrition.py – it use to quiqly inspects on scripts
 
-- Styling: [style.css](style.css).
-- Helper class: [food_utils.FoodUtil](food_utils.py).
-Data notes
+ 9 index.html / script.js / style.css – files to develop web UI
 
-- Expected dataset file names and locations:
-- [daily_food_nutrition_dataset.csv](daily_food_nutrition_dataset.csv) (project root)
-- [folder_datasets/nutrition_dataset.csv](folder_datasets/nutrition_dataset.csv)
-- Loader [data_loader.load_dataset](data_loader.py) uses on_bad_lines="skip" when dealing with malformed CSV lines.
+10 Datasets:
 
-Usage patterns
-Web UI: The user uploads an image and optionally types a food name. The top candidates along with an overlaid result image are returned by [detect_and_lookup.index](detect_and_lookup.py)
-CLI: Run [main.py](main.py) to capture from the webcam, detect food, then query nutrition via [lookup.get_nutrition](lookup.py).
-## Troubleshooting & tips
+daily_food_nutrition_dataset.csv
 
-These would include checking that the camera drivers are accessible, and the device index is appropriate if cv2.VideoCapture(0) fails-try 1, 2, etc.
-- If loading the dataset fails, ensure that daily_food_nutrition_dataset.csv is in your project root, or update paths in either [data_loader.py](data_loader.py) or [lookup.py](lookup.py).
-
-The first time it runs, TensorFlow MobileNetV2 downloads. Be sure you have internet access during this initial download of the model (detect.py).
-
-## Extending the project
-- Enhance matching in [detect_and_lookup.find_candidates](detect_and_lookup.py) (for now, token&substring based)
-Add better parsing and normalization of datasets in [data_loader.load_dataset](data_loader.py).
-- Use a food-specific classifier or transfer learning instead of MobileNetV2 to enhance accuracy in the [detect.py](detect.py) file.
--Save user selections or history (for example, using a small SQLite database).
-Tests & CI
-- No unit tests are provided. Suggested tests:
-- Dataset loader (data_loader.load_dataset)
-- lookup functions (lookup.get_nutrition, food_utils.FoodUtil.get_nutrition)
-- Candidate-finding logic detect_and_lookup.find_candidates
-## License & Contributing
-- Add your license file of choice.
-Contributions can be made by forking the project, adding tests and features, then opening a pull request.
---- Project files: - [app.py](app.py) - [detect.py](detect.py) - [lookup.py](lookup.py) - [detect_and_lookup.py](detect_and_lookup.py) - [data_loader.py](data_loader.py) - [food_utils.py](food_utils.py) - [main.py](main.py) - [read.py](read.py) - [food_nutrition.py](food_nutrition.py) - [index.html](index.html) - [script.js](script.js) - [style.css](style.css) - [daily_food_nutrition_dataset.csv](daily_food_nutrition_dataset.csv) - [folder_datasets/nutrition_dataset.csv](folder_datasets/nutrition_dataset.csv)r
+folder_datasets/nutrition_dataset.csv
 
 
+# Quick Start
 
-A lightweight Python project that can run completely offline: detects food from an image anFood Nutrient Detector
-
-A lightweight Python project that can run completely offline: detects food from an image and retrieves nutrition information from CSV files. Includes both a command-line interface, a simple Flask web user interface, and tools for loading and querying nutrition datasets.
-
-Features
-- Image-based food detection using MobileNetV2 ([detect.detect_food](detect.py)).
-Nutrition lookup from CSV datasets ([lookup.get_nutrition](lookup.py), [food_utils.FoodUtil](food_utils.py)).
-- A simple Flask web UI to upload images and show results: [app.py](app.py), [detect_and_lookup.py](detect_and_lookup.py), [index.html](index.html), [script.js](script.js), [style.css](style.css).
-Methods to load and inspect the datasets: [data_loader.load_dataset](data_loader.py), [read.py](read.py), [food_nutrition.py](food_nutrition.py).
-
-CSV datasets included: daily_food_nutrition_dataset.csv and nutrition_dataset.csv, see folder nutrition_dataset.csv/ and folder_datasets/.
-## Repository structure
-- [app.py](app.py) — Minimal Flask API endpoints using [lookup.get_nutrition](lookup.py) and [detect.detect_food](detect.py).
-- [detect.py](detect.py) — Camera capture and MobileNetV2 inference (detect_food).
-- [lookup.py](lookup.py) — CSV-based nutrition lookup (get_nutrition).
-- [detect_and_lookup.py](detect_and_lookup.py) — Flask web application which overlays nutrition on images and serves the UI via the index route.
-- [data_loader.py](data_loader.py) —CSV loader helper (load_dataset).
-- [food_utils.py](food_utils.py) — FoodUtil helper class for dataset queries.
-- [main.py](main.py) — CLI demo which captures image, detects food, and prints nutrition.
-- [read.py](read.py), [food_nutrition.py](food_nutrition.py) - quick dataset inspection scripts.
-- [index.html](index.html), [script.js](script.js), [style.css](style.css) — web UI files.
-- Datasets :
-
-- daily_food_nutrition_dataset.csv
-
-nutrition_dataset.csv and the folder_datasets/ subfolder.
-Quick start
-1. Create Python virtual environment and install dependencies:
-sh
+1  to Set up Python environment
 
 python -m venv .venv
 
-source .venv/bin/activate  # or .venv\Scripts\activate on Windows
-pip install -r requirements.txt
-
-(If there is no requirements.txt, install: flask opencv-python tensorflow pandas.)
-
-2. Start the web app, simple UI:
-sh
-
-python detect_and_lookup.py
-
-Open http://127.0.0.1:5000/
-3. Run the minimal API (alternative):
-
-sh
-
-python app.py
-- API endpoint: POST /get_nutrition uses [lookup.get_nutrition](lookup.py).
-- JavaScript detection trigger calls /detect in the UI flow (script.js).
-4. CLI demo:
-sh
-python main.py
-This uses [detect.detect_food](detect.py) to capture an image from the webcam before looking up nutrition with [lookup.get_nutrition](lookup.py).
-## Important code entry points (quick links)
-
-- Detection: [detect.detect_food](detect.py) — captures from the webcam and returns the top label.
-- Lookup: [lookup.get_nutrition](lookup.py) — reads daily_food_nutrition_dataset.csv.
-- Dataset loader: [data_loader.load_dataset](data_loader.py)
-- Web UI route: [detect_and_lookup.index](detect_and_lookup.py)
-
-- UI template: [index.html](index.html)
-- Client-side script: [script.js](script.js).
-
-- Styling: [style.css](style.css).
-- Helper class: [food_utils.FoodUtil](food_utils.py).
-Data notes
-
-- Expected dataset file names and locations:
-- [daily_food_nutrition_dataset.csv](daily_food_nutrition_dataset.csv) (project root)
-- [folder_datasets/nutrition_dataset.csv](folder_datasets/nutrition_dataset.csv)
-- Loader [data_loader.load_dataset](data_loader.py) uses on_bad_lines="skip" when dealing with malformed CSV lines.
-
-Usage patterns
-Web UI: The user uploads an image and optionally types a food name. The top candidates along with an overlaid result image are returned by [detect_and_lookup.index](detect_and_lookup.py)
-CLI: Run [main.py](main.py) to capture from the webcam, detect food, then query nutrition via [lookup.get_nutrition](lookup.py).
-## Troubleshooting & tips
-
-These would include checking that the camera drivers are accessible, and the device index is appropriate if cv2.VideoCapture(0) fails-try 1, 2, etc.
-- If loading the dataset fails, ensure that daily_food_nutrition_dataset.csv is in your project root, or update paths in either [data_loader.py](data_loader.py) or [lookup.py](lookup.py).
-
-The first time it runs, TensorFlow MobileNetV2 downloads. Be sure you have internet access during this initial download of the model (detect.py).
-
-## Extending the project
-- Enhance matching in [detect_and_lookup.find_candidates](detect_and_lookup.py) (for now, token&substring based)
-Add better parsing and normalization of datasets in [data_loader.load_dataset](data_loader.py).
-- Use a food-specific classifier or transfer learning instead of MobileNetV2 to enhance accuracy in the [detect.py](detect.py) file.
--Save user selections or history (for example, using a small SQLite database).
-Tests & CI
-- No unit tests are provided. Suggested tests:
-- Dataset loader (data_loader.load_dataset)
-- lookup functions (lookup.get_nutrition, food_utils.FoodUtil.get_nutrition)
-- Candidate-finding logic detect_and_lookup.find_candidates
-## License & Contributing
-- Add your license file of choice.
-Contributions can be made by forking the project, adding tests and features, then opening a pull request.
---- Project files: - [app.py](app.py) - [detect.py](detect.py) - [lookup.py](lookup.py) - [detect_and_lookup.py](detect_and_lookup.py) - [data_loader.py](data_loader.py) - [food_utils.py](food_utils.py) - [main.py](main.py) - [read.py](read.py) - [food_nutrition.py](food_nutrition.py) - [index.html](index.html) - [script.js](script.js) - [style.css](style.css) - [daily_food_nutrition_dataset.csv](daily_food_nutrition_dataset.csv) - [folder_datasets/nutrition_dataset.csv](folder_datasets/nutrition_dataset.csv)d retrieves nutrition information from CSV files. Includes both a command-line interface, a simple Flask web user interface, and tools for loading and querying nutrition datasets.
-
-
-
-Features
-
-- Image-based food detection using MobileNetV2 ([detect.detect_food](detect.py)).
-
-Nutrition lookup from CSV datasets ([lookup.get_nutrition](lookup.py), [food_utils.FoodUtil](food_utils.py)).
-
-- A simple Flask web UI to upload images and show results: [app.py](app.py), [detect_and_lookup.py](detect_and_lookup.py), [index.html](index.html), [script.js](script.js), [style.css](style.css).
-
-Methods to load and inspect the datasets: [data_loader.load_dataset](data_loader.py), [read.py](read.py), [food_nutrition.py](food_nutrition.py).
-
-
-
-CSV datasets included: daily_food_nutrition_dataset.csv and nutrition_dataset.csv, see folder nutrition_dataset.csv/ and folder_datasets/.
-
-## Repository structure
-
-- [app.py](app.py) — Minimal Flask API endpoints using [lookup.get_nutrition](lookup.py) and [detect.detect_food](detect.py).
-
-- [detect.py](detect.py) — Camera capture and MobileNetV2 inference (detect_food).
-
-- [lookup.py](lookup.py) — CSV-based nutrition lookup (get_nutrition).
-
-- [detect_and_lookup.py](detect_and_lookup.py) — Flask web application which overlays nutrition on images and serves the UI via the index route.
-
-- [data_loader.py](data_loader.py) —CSV loader helper (load_dataset).
-
-- [food_utils.py](food_utils.py) — FoodUtil helper class for dataset queries.
-
-- [main.py](main.py) — CLI demo which captures image, detects food, and prints nutrition.
-
-- [read.py](read.py), [food_nutrition.py](food_nutrition.py) - quick dataset inspection scripts.
-
-- [index.html](index.html), [script.js](script.js), [style.css](style.css) — web UI files.
-
-- Datasets :
-
-
-
-- daily_food_nutrition_dataset.csv
-
-
-
-nutrition_dataset.csv and the folder_datasets/ subfolder.
-
-Quick start
-
-1. Create Python virtual environment and install dependencies:
-
-sh
-
-
-
-python -m venv .venv
-
-
-
-source .venv/bin/activate  # or .venv\Scripts\activate on Windows
-
+source .venv/bin/activate 
+ 
 pip install -r requirements.txt
 
 
 
-(If there is no requirements.txt, install: flask OpenCV-python tensorflow pandas.)
-
-
-
-2. Start the web app, simple UI:
-
-sh
-
-
+2  to Start web UI
 
 python detect_and_lookup.py
+Open: http://127.0.0.1:5000/
 
-
-
-Open http://127.0.0.1:5000/
-
-3. Run the minimal API (alternative):
-
-
-
-sh
-
-
+3 to Run minimal API
 
 python app.py
 
-- API endpoint: POST /get_nutrition uses [lookup.get_nutrition](lookup.py).
 
-- JavaScript detection trigger calls /detect in the UI flow (script.js).
+*POST /get_nutrition → lookup.get_nutrition
 
-4. CLI demo:
+/detect → JavaScript triggers detection in UI
 
-sh
+4 to Run CLI demo
 
 python main.py
 
-This uses [detect.detect_food](detect.py) to capture an image from the webcam before looking up nutrition with [lookup.get_nutrition](lookup.py).
+*Captures image from webcam → detects food → retrieves nutrition info.
 
-## Important code entry points (quick links)
+# Important Code Entry Points
 
+Detection: detect.detect_food
 
+Lookup: lookup.get_nutrition
 
-- Detection: [detect.detect_food](detect.py) — captures from the webcam and returns the top label.
+Dataset loader: data_loader.load_dataset
 
-- Lookup: [lookup.get_nutrition](lookup.py) — reads daily_food_nutrition_dataset.csv.
+Web UI route: detect_and_lookup.index
 
-- Dataset loader: [data_loader.load_dataset](data_loader.py)
+UI template / JS / CSS: index.html
+, script.js
+, style.css
 
-- Web UI route: [detect_and_lookup.index](detect_and_lookup.py)
+Helper class: food_utils.FoodUtil
 
+# Data Notes
 
+Expected dataset locations:
 
-- UI template: [index.html](index.html)
+daily_food_nutrition_dataset.csv (root)
 
-- Client-side script: [script.js](script.js).
+folder_datasets/nutrition_dataset.csv
 
+Loader uses on_bad_lines="skip" for malformed CSV rows.
 
+# Usage Patterns
 
-- Styling: [style.css](style.css).
+* Web UI: it upload image and then find optional food name  and then return
 
-- Helper class: [food_utils.FoodUtil](food_utils.py).
+* CLI: Run main.py → webcam capture → detect food → query nutrition.
 
-Data notes
+# Troubleshooting
 
+Camera issues: Check drivers or try cv2.VideoCapture(1) / 2 if 0 fails.
 
+Dataset loading fails: Ensure CSV files are in correct paths.
 
-- Expected dataset file names and locations:
+MobileNetV2 download: First run requires internet.
 
-- [daily_food_nutrition_dataset.csv](daily_food_nutrition_dataset.csv) (project root)
+Extending the Project
 
-- [folder_datasets/nutrition_dataset.csv](folder_datasets/nutrition_dataset.csv)
+Improve matching in detect_and_lookup.find_candidates.
 
-- Loader [data_loader.load_dataset](data_loader.py) uses on_bad_lines="skip" when dealing with malformed CSV lines.
+Normalize datasets better in data_loader.load_dataset.
 
+Use transfer learning or food-specific classifier for higher accuracy.
 
+Save user history (e.g., SQLite DB).
 
-Usage patterns
+Tests & CI Suggestions
 
-Web UI: The user uploads an image and optionally types a food name. The top candidates along with an overlaid result image are returned by [detect_and_lookup.index](detect_and_lookup.py)
+Dataset loader (data_loader.load_dataset
+)
 
-CLI: Run [main.py](main.py) to capture from the webcam, detect food, then query nutrition via [lookup.get_nutrition](lookup.py).
+Lookup functions (lookup.get_nutrition
+, FoodUtil.get_nutrition)
 
-## Troubleshooting & tips
-
-
-
-These would include checking that the camera drivers are accessible, and the device index is appropriate if cv2.VideoCapture(0) fails-try 1, 2, etc.
-
-- If loading the dataset fails, ensure that daily_food_nutrition_dataset.csv is in your project root, or update paths in either [data_loader.py](data_loader.py) or [lookup.py](lookup.py).
-
-
-
-The first time it runs, TensorFlow MobileNetV2 downloads. Be sure you have internet access during this initial download of the model (detect.py).
-
-
-
-## Extending the project
-
-- Enhance matching in [detect_and_lookup.find_candidates](detect_and_lookup.py) (for now, token&substring based)
-
-Add better parsing and normalization of datasets in [data_loader.load_dataset](data_loader.py).
-
-- Use a food-specific classifier or transfer learning instead of MobileNetV2 to enhance accuracy in the [detect.py](detect.py) file.
-
--Save user selections or history (for example, using a small SQLite database).
-
-Tests & CI
-
-- No unit tests are provided. Suggested tests:
-
-- Dataset loader (data_loader.load_dataset)
-
-- lookup functions (lookup.get_nutrition, food_utils.FoodUtil.get_nutrition)
-
-- Candidate-finding logic detect_and_lookup.find_candidates
-
-## License & Contributing
-
-- Add your license file of choice.
-
-Contributions can be made by forking the project, adding tests and features, then opening a pull request.
-
---- Project files: - [app.py](app.py) - [detect.py](detect.py) - [lookup.py](lookup.py) - [detect_and_lookup.py](detect_and_lookup.py) - [data_loader.py](data_loader.py) - [food_utils.py](food_utils.py) - [main.py](main.py) - [read.py](read.py) - [food_nutrition.py](food_nutrition.py) - [index.html](index.html) - [script.js](script.js) - [style.css](style.css) - [daily_food_nutrition_dataset.csv](daily_food_nutrition_dataset.csv) - [folder_datasets/nutrition_dataset.csv](folder_datasets/nutrition_dataset.csv)
-
+Candidate-finding logic (detect_and_lookup.find_candidates
+)
