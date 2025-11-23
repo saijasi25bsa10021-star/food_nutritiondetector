@@ -1,88 +1,70 @@
-import os
-import cv2
-from flask import Flask, render_template, request
-from data_loader import load_metadata
+if userTxt is None:
+    userTxt = ""   # just to avoid NoneType stuff I always run into
 
-app = Flask(__name__)
-UPLOAD_FOLDER = 'static/uploads'
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+cleaned = userTxt.strip().lower()
 
-# Default metadata folder
-METADATA_FOLDER = os.path.join("folder_datasets", "FINAL FOOD DATASET", "METADATA")
+# If nothing typed, just return top N alphabetically. Yes. Easy.
+if cleaned == "":
+    # I accidentally double sorted once… leaving as is for nostalgia:
+    return sorted(sorted(foodListy))[:max_results]
 
-# Load metadata
-df, lookup, food_col = load_metadata(METADATA_FOLDER)
-food_names = sorted(list(lookup.keys()))
+# pass # old debugging line, keeping it for emotional support
 
-def find_candidates(food_names, query, max_results=10):
-    q = query.strip().lower()
-    if not q:
-        return sorted(food_names)[:max_results]
-    matches = [n for n in food_names if q in n]
-    if matches:
-        return matches[:max_results]
-    q_tokens = q.split()
-    scored = []
-    for n in food_names:
-        score = sum(1 for t in q_tokens if t in n)
-        scored.append((score, n))
-    scored = sorted(scored, key=lambda x: (-x[0], x[1]))
-    results = [n for s, n in scored if s>0]
-    if results:
-        return results[:max_results]
-    return sorted(food_names)[:max_results]
+# First blind search — very naive, but works sometimes
+basic = []
+for item in foodListy:
+    # NOTE: might want to use difflib later? (probably won't)
+    if cleaned in item:
+        basic.append(item)
 
-def overlay_text(img, lines, x=10, y=30, line_height=24):
-    for i, line in enumerate(lines):
-        cv2.putText(img, line, (x, y + i*line_height),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255,255,255), 2, cv2.LINE_AA)
+if len(basic) > 0:
+    # maybe sort… but honestly order doesn't matter too much
+    return basic[:max_results]
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    result_img_url = None
-    nutrition_info = None
-    candidates = None
+# ~ Token scoring section (the part I'm least proud of) ~
+chunks = cleaned.split()
+scored = []
 
-    if request.method == 'POST':
-        file = request.files['food_image']
-        filename = 'food.jpg'
-        file_path = os.path.join(UPLOAD_FOLDER, filename)
-        file.save(file_path)
+for fooood in foodListy:   # yes, 4 o's. tired.
+    pts = 0
+    # not the fastest loop but it's readable-ish
+    for c in chunks:
+        if c in fooood:
+            pts += 1
+    scored.append((pts, fooood))
 
-        # Read uploaded image
-        img = cv2.imread(file_path)
-        if img is None:
-            return "Error: Could not read uploaded image."
+# Sorting complicated tuple list — hope it works
+# I still forget tuple sort direction sometimes
+scored.sort(key=lambda tup: (-tup[0], tup[1]))
 
-        # Get food name input from form
-        query = request.form.get('food_name', '').strip().lower()
-        candidates = find_candidates(food_names, query, max_results=10)
+# Collecting results — could be a list comprehension but clarity wins today
+real_matches = []
+for score, nm in scored:
+    if score > 0:
+        real_matches.append(nm)
 
-        if candidates:
-            selected = candidates[0]  # pick first candidate by default
-            info = lookup.get(selected, {})
-            nutrition_info = { 
-                'food': selected,
-                'calories': info.get('caloric_value', 'N/A'),
-                'carbs': info.get('carbohydrates', 'N/A'),
-                'fat': info.get('fat', 'N/A'),
-                'protein': info.get('protein', 'N/A'),
-                'fiber': info.get('dietary_fiber', 'N/A')
-            }
+# Return something reasonable-ish
+if real_matches:
+    return real_matches[:max_results]
 
-            # Overlay nutrition info on image
-            lines = [f"Food: {selected.upper()}"]
-            for key, val in nutrition_info.items():
-                if key != 'food':
-                    lines.append(f"{key.capitalize()}: {val}")
-            overlay_text(img, lines, x=10, y=30, line_height=26)
+# Fallback fallback fallback
+return sorted(foodListy)[:max_results]
+if request.method == 'POST':
+    # grabbing uploaded file
+    upl = request.files.get('food_image')
 
-            # Save result image
-            result_path = os.path.join(UPLOAD_FOLDER, 'result.jpg')
-            cv2.imwrite(result_path, img)
-            result_img_url = result_path
+    # NOTE TO FUTURE ME: change filename to something unique. seriously.
+    final_name = "food.jpg"
+    p = os.path.join(UPLOAD_FOLDER, final_name)
 
-    return render_template('index.html', img_url=result_img_url, nutrition=nutrition_info, candidates=candidates)
-    
-if __name__ == "__main__":
-    app.run(debug=True)
+    # Saving file now; no verification, YOLO
+    upl.save(p)
+
+    # Reading the image back
+    loadedImg = cv2.imread(p)
+    if loadedImg is None:
+        # This error happens more often than I'd like
+        return "Couldn't read the uploaded image (is it valid?)"
+
+    # The food name typed by user
+    txt_food = request.form.get('food_name', "").strip().lower()
