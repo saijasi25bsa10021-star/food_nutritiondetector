@@ -132,4 +132,8 @@ Lookup functions (lookup.get_nutrition
 , FoodUtil.get_nutrition)
 
 Candidate-finding logic (detect_and_lookup.find_candidates
+<<<<<<< HEAD
 )
+=======
+)
+>>>>>>> b302ea9745427aafbf6986c438775e383305b92f
